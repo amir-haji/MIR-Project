@@ -61,11 +61,11 @@ class IMDbCrawler:
         Save the crawled files into json
         """
         # TODO
-        with open('IMDB_crawled2.json', 'w') as f:
+        with open('IMDB_crawled.json', 'w') as f:
             f.write(json.dumps(self.crawled))
             f.close()
 
-        with open('IMDB_not_crawled2.json', 'w') as f:
+        with open('IMDB_not_crawled.json', 'w') as f:
             f.write(json.dumps(self.not_crawled))
             f.close()
 
@@ -75,13 +75,13 @@ class IMDbCrawler:
         """
         # TODO
         # Done
-        with open('IMDB_crawled2.json', 'r') as f:
+        with open('IMDB_crawled.json', 'r') as f:
             raw_data_0 = f.read()
             f.close()
 
         self.crawled = json.loads(raw_data_0)
 
-        with open('IMDB_not_crawled2.json', 'w') as f:
+        with open('IMDB_not_crawled.json', 'w') as f:
             raw_data_1 = f.read()
             f.close()
 
