@@ -10,7 +10,7 @@ class Snippet:
         """
         self.number_of_words_on_each_side = number_of_words_on_each_side
         
-        with open('stopwords.txt', 'r') as f:
+        with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core/stopwords.txt', 'r') as f:
             self.stopwords = f.read().split('\n')
             f.close()
 

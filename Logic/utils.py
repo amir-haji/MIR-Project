@@ -5,7 +5,10 @@ from .core.snippet import Snippet
 from .core.indexer.indexes_enum import Indexes, Index_types
 import json
 
-movies_dataset = None  # TODO
+with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/index/documents_index.json', 'r') as f:
+    movies_dataset = json.loads(f.read())
+    f.close()
+
 search_engine = SearchEngine()
 
 
@@ -61,7 +64,12 @@ def search(
     list
     Retrieved documents with snippet
     """
-    weights = ...  # TODO
+    # TODO
+    weights = {
+        Indexes.STARS: weights[0],
+        Indexes.GENRES: weights[1],
+        Indexes.SUMMARIES: weights[2]
+    } 
     return search_engine.search(
         query, method, weights, max_results=max_result_count, safe_ranking=True
     )

@@ -77,8 +77,9 @@ class SpellCorrection:
 
         # TODO: Create shingled words dictionary and word counter dictionary here.
         
-        for document in all_documents:
+        for doc_id in all_documents:
             result = ''
+            document = all_documents[doc_id]
             for summary in document['summaries']:
                 s = summary.strip()
                 result = result + s + ' '
