@@ -18,7 +18,7 @@ class Preprocessor:
             The list of documents to be preprocessed, path to stop words, or other parameters.
         """
         # TODO
-        with open('stopwords.txt', 'r') as f:
+        with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/UI/../Logic/core/stopwords.txt', 'r') as f:
             txt = f.read()
             f.close()
             
@@ -38,19 +38,23 @@ class Preprocessor:
         """
          # TODO
         for doc in self.documents:
-            for k in doc:
-                if isinstance(doc[k], list):
-                    new_item = []
-                    if len(doc[k]) != 0:
-                        if isinstance(doc[k][0], list):
-                            # reviews
-                            for review, score in doc[k]:
-                                new_item.append([self.normalize(review), score])
-                        else:
-                            new_item = [self.normalize(text) for text in doc[k]]
-                    doc[k] = new_item
-                else:
-                    doc[k] = self.normalize(doc[k])
+            if isinstance(doc, str):
+                self.documents = [self.normalize(doc)]
+                return self.documents.copy()
+            else:
+                for k in doc:
+                    if isinstance(doc[k], list):
+                        new_item = []
+                        if len(doc[k]) != 0:
+                            if isinstance(doc[k][0], list):
+                                # reviews
+                                for review, score in doc[k]:
+                                    new_item.append([self.normalize(review), score])
+                            else:
+                                new_item = [self.normalize(text) for text in doc[k]]
+                        doc[k] = new_item
+                    else:
+                        doc[k] = self.normalize(doc[k])
                     
         return
 
@@ -72,16 +76,7 @@ class Preprocessor:
 
         text = unidecode.unidecode(text)
         text = text.lower()
-        """
-        contractions = {r'we[\’\']re': 'we are',
-                        r'do[\’\']nt': 'do not',
-                        r'ca[\’\']nt': 'cannot',
-                        r'is[\’\']nt': 'is not',
-                       r'does[\’\']nt': 'does not'}
         
-        for k, v in contractions.items():
-            text = re.sub(k, v, text)
-        """
         text = re.sub(r'\n', ' ', text)
         text = re.sub(r'\s+', ' ', text)
         text.strip()
@@ -94,7 +89,7 @@ class Preprocessor:
             words = self.remove_stopwords(sent)
             normalized_text = normalized_text + ' ' + ' '.join(words)
         
-        return normalized_text
+        return normalized_text.strip()
 
     def remove_links(self, text: str):
         """

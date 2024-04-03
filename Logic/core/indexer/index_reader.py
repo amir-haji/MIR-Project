@@ -1,4 +1,4 @@
-from indexes_enum import Indexes,Index_types
+from .indexes_enum import Indexes,Index_types
 import json
 class Index_reader:
     def __init__(self,path: str, index_name: Indexes, index_type: Index_types = None):
@@ -17,7 +17,7 @@ class Index_reader:
         self.path = path
         self.index_name = index_name
         self.index_type = index_type
-        self.index = self.get_index()
+        # self.index = self.get_index()
 
     def get_index(self):
         """
