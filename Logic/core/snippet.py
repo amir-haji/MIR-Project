@@ -9,6 +9,10 @@ class Snippet:
             The number of words on each side of the query word in the doc to be presented in the snippet.
         """
         self.number_of_words_on_each_side = number_of_words_on_each_side
+        
+        with open('stopwords.txt', 'r') as f:
+            self.stopwords = f.read().split('\n')
+            f.close()
 
     def remove_stop_words_from_query(self, query):
         """
@@ -26,8 +30,11 @@ class Snippet:
         """
 
         # TODO: remove stop words from the query.
-
-        return
+        q = query
+        for stopword in self.stopwords:
+            q = q.replace(stopword, '')
+        
+        return q
 
     def find_snippet(self, doc, query):
         """
@@ -52,5 +59,30 @@ class Snippet:
         not_exist_words = []
 
         # TODO: Extract snippet and the tokens which are not present in the doc.
+        
+        query_tokens = query.split(' ')
+        doc_tokens = doc.split(' ')
+        occurance_indexes = []
+        
+        for token in query_tokens:
+            if token not in doc_tokens:
+                not_exist_words.append(token)
+            else:
+                indices = [i for i, x in enumerate(doc_tokens) if x == token]
+                occurance_indexes = occurance_indexes + indices
+                
+        for index in occurance_indexes:
+            doc_tokens[index] = '***' + doc_tokens[index] + '***'
+
+        eliminated_indices = []
+        for i in range(0, len(occurance_indexes) - 1):
+            if occurance_indexes[i+1] - occurance_indexes[i] <= 10:
+                eliminated_indices.append(occurance_indexes[i])
+                        
+        for index in occurance_indexes:
+            if index not in eliminated_indices:
+                sub_snippet = ' '.join(doc_tokens[max(index - self.number_of_words_on_each_side, 0): min(index + self.number_of_words_on_each_side + 1, len(doc_tokens) - 1)])
+                print(sub_snippet)
+                final_snippet = final_snippet + sub_snippet + '...'
 
         return final_snippet, not_exist_words

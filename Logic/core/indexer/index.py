@@ -2,8 +2,8 @@ import time
 import os
 import json
 import copy
-from .indexes_enum import Indexes
-
+from indexes_enum import Indexes
+from tiered_index import Tiered_index
 
 class Index:
     def __init__(self, preprocessed_documents: list):
@@ -12,9 +12,10 @@ class Index:
         """
 
         self.preprocessed_documents = preprocessed_documents
-
+        self.index_of_documents = self.index_documents()
+        
         self.index = {
-            Indexes.DOCUMENTS.value: self.index_documents(),
+            Indexes.DOCUMENTS.value: self.index_of_documents,
             Indexes.STARS.value: self.index_stars(),
             Indexes.GENRES.value: self.index_genres(),
             Indexes.SUMMARIES.value: self.index_summaries(),
@@ -32,7 +33,11 @@ class Index:
         """
 
         current_index = {}
-        #         TODO
+        #TODO
+        
+        for doc in self.preprocessed_documents:
+            document_id = doc['id']
+            current_index[document_id] = doc
 
         return current_index
 
@@ -48,7 +53,22 @@ class Index:
         """
 
         #         TODO
-        pass
+        current_index = {}
+        sorted_ids = sorted(list(self.index_of_documents.keys()))
+        for ID in sorted_ids:
+            doc = self.index_of_documents[ID]
+            for name in doc['stars']:
+                terms = name.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if ID in current_index[term]:
+                            current_index[term][ID] += 1
+                        else:
+                            current_index[term][ID] = 1
+                    else:
+                        current_index[term] = {ID: 1}
+                        
+        return current_index
 
     def index_genres(self):
         """
@@ -62,7 +82,22 @@ class Index:
         """
 
         #         TODO
-        pass
+        current_index = {}
+        sorted_ids = sorted(list(self.index_of_documents.keys()))
+        for ID in sorted_ids:
+            doc = self.index_of_documents[ID]
+            for name in doc['genres']:
+                terms = name.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if ID in current_index[term]:
+                            current_index[term][ID] += 1
+                        else:
+                            current_index[term][ID] = 1
+                    else:
+                        current_index[term] = {ID: 1}
+                        
+        return current_index
 
     def index_summaries(self):
         """
@@ -75,8 +110,21 @@ class Index:
             So the index type is: {term: {document_id: tf}}
         """
 
-        current_index = {}
         #         TODO
+        current_index = {}
+        sorted_ids = sorted(list(self.index_of_documents.keys()))
+        for ID in sorted_ids:
+            doc = self.index_of_documents[ID]
+            for summary in doc['summaries']:
+                terms = summary.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if ID in current_index[term]:
+                            current_index[term][ID] += 1
+                        else:
+                            current_index[term][ID] = 1
+                    else:
+                        current_index[term] = {ID: 1}
 
         return current_index
 
@@ -99,7 +147,7 @@ class Index:
 
         try:
             #         TODO
-            pass
+            return list(self.index[index_type][word].keys())
         except:
             return []
 
@@ -114,7 +162,47 @@ class Index:
         """
 
         #         TODO
-        pass
+        ID = document['id']
+        if ID in self.index[Indexes.DOCUMENTS.value]:
+            print('document was existed in index')
+        else:
+            self.index[Indexes.DOCUMENTS.value][ID] = document
+            
+            current_index = self.index[Indexes.STARS.value]
+            for name in document['stars']:
+                terms = name.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if ID in current_index[term]:
+                            current_index[term][ID] += 1
+                        else:
+                            current_index[term][ID] = 1
+                    else:
+                        current_index[term] = {ID: 1}
+                        
+            current_index = self.index[Indexes.GENRES.value]
+            for name in document['genres']:
+                terms = name.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if ID in current_index[term]:
+                            current_index[term][ID] += 1
+                        else:
+                            current_index[term][ID] = 1
+                    else:
+                        current_index[term] = {ID: 1}
+                        
+            current_index = self.index[Indexes.SUMMARIES.value]
+            for summary in document['summaries']:
+                terms = summary.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if ID in current_index[term]:
+                            current_index[term][ID] += 1
+                        else:
+                            current_index[term][ID] = 1
+                    else:
+                        current_index[term] = {ID: 1}
 
     def remove_document_from_index(self, document_id: str):
         """
@@ -127,7 +215,36 @@ class Index:
         """
 
         #         TODO
-        pass
+        if document_id not in self.index[Indexes.DOCUMENTS.value]:
+            print('document does\'nt exist in index')
+        else:
+            document = self.index[Indexes.DOCUMENTS.value][document_id]
+            
+            current_index = self.index[Indexes.STARS.value]
+            for name in document['stars']:
+                terms = name.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if document_id in current_index[term]:
+                            del current_index[term][document_id]
+            
+            current_index = self.index[Indexes.GENRES.value]
+            for name in document['genres']:
+                terms = name.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if document_id in current_index[term]:
+                            del current_index[term][document_id]
+                            
+            current_index = self.index[Indexes.SUMMARIES.value]
+            for summary in document['summaries']:
+                terms = summary.split(' ')
+                for term in terms:
+                    if term in current_index:
+                        if document_id in current_index[term]:
+                            del current_index[term][document_id]
+                            
+            del self.index[Indexes.DOCUMENTS.value][document_id]
 
     def check_add_remove_is_correct(self):
         """
@@ -198,11 +315,19 @@ class Index:
         if not os.path.exists(path):
             os.makedirs(path)
 
+        if index_name is None:
+            # TODO
+            Tiered_index(path)
+            return
+                        
+            
         if index_name not in self.index:
-            raise ValueError('Invalid index name')
+            raise ValueError('Invalid index type')
 
-        # TODO
-        pass
+        #         TODO
+        with open(path + f'{index_name}_index.json', 'w') as f:
+            f.write(json.dumps(self.index[index_name]))
+            f.close()
 
     def load_index(self, path: str):
         """
@@ -215,7 +340,17 @@ class Index:
         """
 
         #         TODO
-        pass
+        with open(path + '/stars_index.json', 'r') as f:
+            self.index[Indexes.STARS.value] = json.loads(f.read())
+            f.close()
+            
+        with open(path + '/genres_index.json', 'r') as f:
+            self.index[Indexes.GENRES.value] = json.loads(f.read())
+            f.close()
+            
+        with open(path + '/summaries_index.json', 'r') as f:
+            self.index[Indexes.SUMMARIES.value] = json.loads(f.read())
+            f.close()
 
     def check_if_index_loaded_correctly(self, index_type: str, loaded_index: dict):
         """
@@ -284,6 +419,7 @@ class Index:
         print('Brute force time: ', brute_force_time)
         print('Implemented time: ', implemented_time)
 
+        
         if set(docs).issubset(set(posting_list)):
             print('Indexing is correct')
 
@@ -298,3 +434,25 @@ class Index:
             return False
 
 # TODO: Run the class with needed parameters, then run check methods and finally report the results of check methods
+
+if __name__ == "__main__":
+    with open('/Users/hajmohammadrezaee/Desktop/preprocessed.json', 'r') as f:
+        preprocessed_data = json.loads(f.read())
+        f.close()
+
+    index_obj = Index(preprocessed_data)
+
+    index_obj.check_add_remove_is_correct()
+    index_obj.check_if_indexing_is_good('summaries')
+    index_obj.check_if_indexing_is_good('summaries', 'crime')
+
+    index_obj.check_if_indexing_is_good('genres', 'drama')
+    index_obj.check_if_indexing_is_good('genres', 'action')
+
+    index_obj.check_if_indexing_is_good('stars', 'christian')
+    index_obj.check_if_indexing_is_good('stars', 'tarantino')
+
+    index_obj.store_index('index/', 'documents')
+    index_obj.store_index('index/', 'genres')
+    index_obj.store_index('index/', 'stars')
+    index_obj.store_index('index/', 'summaries')

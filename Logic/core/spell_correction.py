@@ -29,6 +29,8 @@ class SpellCorrection:
         shingles = set()
         
         # TODO: Create shingle here
+        for i in range(0, len(word) - k + 1):
+            shingles.add(word[i: i+k])
 
         return shingles
     
@@ -50,8 +52,9 @@ class SpellCorrection:
         """
 
         # TODO: Calculate jaccard score here.
-
-        return
+        
+        jaccard_score = len(first_set.intersection(second_set))/len(first_set.union(second_set))
+        return jaccard_score
 
     def shingling_and_counting(self, all_documents):
         """
@@ -73,7 +76,23 @@ class SpellCorrection:
         word_counter = dict()
 
         # TODO: Create shingled words dictionary and word counter dictionary here.
+        
+        for document in all_documents:
+            result = ''
+            for summary in document['summaries']:
+                s = summary.strip()
+                result = result + s + ' '
                 
+            result = result.strip() 
+            words = result.split(' ')
+            
+            for word in words:
+                if word not in all_shingled_words:
+                    all_shingled_words[word] = self.shingle_word(word)
+                    word_counter[word] = 1
+                else:
+                    word_counter[word] += 1
+                    
         return all_shingled_words, word_counter
     
     def find_nearest_words(self, word):
@@ -93,7 +112,26 @@ class SpellCorrection:
         top5_candidates = list()
 
         # TODO: Find 5 nearest candidates here.
-
+        
+        candidates = []
+        shingles = self.shingle_word(word)
+        
+        for candidate, candidate_shingle in self.all_shingled_words.items():
+            score = self.jaccard_score(shingles, candidate_shingle)
+            candidates.append([candidate, score])
+            
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        top5_candidates = candidates[:5]
+        
+        max_tf = -1
+        for word, _ in top5_candidates:
+            max_tf = max(max_tf, self.word_counter[word])
+            
+        for x in top5_candidates:
+            x[1] = x[1]*(self.word_counter[x[0]])/max_tf
+            
+        top5_candidates.sort(key=lambda x: x[1], reverse=True)
+        top5_candidates = [x[0] for x in top5_candidates]
         return top5_candidates
     
     def spell_check(self, query):
@@ -113,5 +151,18 @@ class SpellCorrection:
         final_result = ""
         
         # TODO: Do spell correction here.
+        
+        query_words = query.split(' ')
+        
+        for word in query_words:
+            if word in self.all_shingled_words:
+                final_result = final_result + word + ' '
+            else:
+                candidates = self.find_nearest_words(word)
+                print(candidates)
+                if candidates[0] is not None:
+                    final_result = final_result + candidates[0] + ' '
+                else:
+                    final_result = final_result + word + ' '
 
-        return final_result
+        return final_result.strip()

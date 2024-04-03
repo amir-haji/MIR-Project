@@ -1,5 +1,5 @@
 import json
-from .indexes_enum import Indexes,Index_types
+from indexes_enum import Indexes,Index_types
 from index_reader import Index_reader
 
 class DocumentLengthsIndex:
@@ -16,9 +16,9 @@ class DocumentLengthsIndex:
 
         self.documents_index = Index_reader(path, index_name=Indexes.DOCUMENTS).index
         self.document_length_index = {
-            Indexes.STARS: self.get_documents_length(Indexes.STARS.value),
-            Indexes.GENRES: self.get_documents_length(Indexes.GENRES.value),
-            Indexes.SUMMARIES: self.get_documents_length(Indexes.SUMMARIES.value)
+            Indexes.STARS: self.get_documents_length(Indexes.STARS),
+            Indexes.GENRES: self.get_documents_length(Indexes.GENRES),
+            Indexes.SUMMARIES: self.get_documents_length(Indexes.SUMMARIES)
         }
         self.store_document_lengths_index(path, Indexes.STARS)
         self.store_document_lengths_index(path, Indexes.GENRES)
@@ -41,6 +41,20 @@ class DocumentLengthsIndex:
         """
 
         # TODO:
+        length_index = {}
+        for doc_id in self.documents_index:
+                if doc_id not in length_index:
+                    if where.value != 'summaries':
+                        length = len(self.documents_index[doc_id][where.value])
+                    else:
+                        length = 0
+                        for summary in self.documents_index[doc_id]['summaries']:
+                            length += len(summary.split(' '))
+
+                length_index[doc_id] = length
+            
+        return length_index
+            
     
     def store_document_lengths_index(self, path , index_name):
         """

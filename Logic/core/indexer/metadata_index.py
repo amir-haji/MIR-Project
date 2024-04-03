@@ -1,5 +1,5 @@
 from index_reader import Index_reader
-from .indexes_enum import Indexes, Index_types
+from indexes_enum import Indexes, Index_types
 import json
 
 class Metadata_index:
@@ -14,6 +14,9 @@ class Metadata_index:
         """
         
         #TODO
+        self.documents = self.read_documents()
+        self.metadata_index = self.create_metadata_index()
+        self.store_metadata_index(path)
 
     def read_documents(self):
         """
@@ -22,13 +25,18 @@ class Metadata_index:
         """
 
         #TODO
+        with open('../preprocessed.json', 'r') as f:
+            data = json.loads(f.read())
+            f.close()
+            
+        return data
 
     def create_metadata_index(self):    
         """
         Creates the metadata index.
         """
         metadata_index = {}
-        metadata_index['averge_document_length'] = {
+        metadata_index['average_document_length'] = {
             'stars': self.get_average_document_field_length('stars'),
             'genres': self.get_average_document_field_length('genres'),
             'summaries': self.get_average_document_field_length('summaries')
@@ -48,6 +56,15 @@ class Metadata_index:
         """
 
         #TODO
+        length = 0
+        for doc in self.documents:
+            if where != 'summaries':
+                length += len(doc[where])
+            else:
+                for summary in doc['summaries']:
+                    length += len(summary.split(' '))
+                    
+        return length/len(self.documents)
 
     def store_metadata_index(self, path):
         """

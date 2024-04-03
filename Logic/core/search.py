@@ -1,10 +1,13 @@
 import json
 import numpy as np
-from .preprocess import Preprocessor
-from .scorer import Scorer
-from .indexer.indexes_enum import Indexes, Index_types
-from .indexer.index_reader import Index_reader
+from preprocess import Preprocessor
+from scorer import Scorer
+from indexer.indexes_enum import Indexes, Index_types
+from indexer.index_reader import Index_reader
 
+
+import json
+import numpy as np
 
 class SearchEngine:
     def __init__(self):
@@ -12,7 +15,7 @@ class SearchEngine:
         Initializes the search engine.
 
         """
-        path = '/index'
+        path = 'index/'
         self.document_indexes = {
             Indexes.STARS: Index_reader(path, Indexes.STARS),
             Indexes.GENRES: Index_reader(path, Indexes.GENRES),
@@ -87,7 +90,14 @@ class SearchEngine:
             The final scores of the documents.
         """
         # TODO
-        pass
+        
+        for doc_id, score_dict in scores.items():
+            sum = 0
+            for field in weights:
+                if field in score_dict:
+                    sum += score_dict[field] * weights[field]
+            final_scores[doc_id] = sum
+            
 
     def find_scores_with_unsafe_ranking(self, query, method, weights, max_results, scores):
         """
@@ -106,10 +116,24 @@ class SearchEngine:
         scores : dict
             The scores of the documents.
         """
-        for field in weights:
-            for tier in ["first_tier", "second_tier", "third_tier"]:
+        
+        for tier in ["first_tier", "second_tier", "third_tier"]:
+            for field in weights:
                 #TODO
-                pass
+                tiered_field_index = self.tiered_index[field].index[tier]
+                scorer_obj = Scorer(tiered_field_index, self.metadata_index.index['document_count'])
+            
+                if method == 'OkapiBM25':
+                    results = scorer_obj.compute_socres_with_okapi_bm25(query, self.metadata_index.index['average_document_length'][field.value], self.document_lengths_index[field].index)
+                else:
+                    results = scorer_obj.compute_scores_with_vector_space_model(query, method)
+                    
+                self.merge_scores(scores, results, field)
+                
+            if len(list(scores.keys())) >= max_results:
+                break
+                    
+                
 
     def find_scores_with_safe_ranking(self, query, method, weights, scores):
         """
@@ -129,9 +153,17 @@ class SearchEngine:
 
         for field in weights:
             #TODO
-            pass
+            field_indexes = self.document_indexes[field].index
+            scorer_obj = Scorer(field_indexes, self.metadata_index.index['document_count'])
+            
+            if method == 'OkapiBM25':
+                results = scorer_obj.compute_socres_with_okapi_bm25(query, self.metadata_index.index['average_document_length'][field.value], self.document_lengths_index[field].index)
+            else:
+                results = scorer_obj.compute_scores_with_vector_space_model(query, method)
+                
+            self.merge_scores(scores, results, field)
 
-    def merge_scores(self, scores1, scores2):
+    def merge_scores(self, scores1, scores2, field):
         """
         Merges two dictionaries of scores.
 
@@ -149,6 +181,12 @@ class SearchEngine:
         """
 
         #TODO
+        for doc_id, score in scores2.items():
+            if doc_id in scores1:
+                scores1[doc_id][field] = score
+            else:
+                scores1[doc_id] = {field: score}
+
 
 
 if __name__ == '__main__':
