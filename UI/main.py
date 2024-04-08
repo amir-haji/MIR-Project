@@ -156,7 +156,7 @@ def main():
         search_weights = [weight_stars, weight_genres, weight_summary]
         search_method = st.selectbox(
             "Search method",
-            ("ltn.lnn", "lnc.ltc", "OkapiBM25"),
+            ("ltn.lnn", "ltc.lnc", "OkapiBM25"),
         )
 
     search_button = st.button("Search!")

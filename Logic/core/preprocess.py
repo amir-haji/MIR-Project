@@ -4,7 +4,7 @@ import contractions
 import unidecode
 import string
 import re
-
+import json
 
 class Preprocessor:
 
@@ -170,3 +170,14 @@ class Preprocessor:
                 final_words.append(contractions.fix(self.lemmatizer.lemmatize(w)))
         return final_words
 
+if __name__ == "__main__":
+    with open('../IMDB_crawled.json', 'r') as f:
+        data = json.loads(f.read())
+        f.close()
+
+    preprocess_obj = Preprocessor(data)
+    preprocess_obj.preprocess()
+
+    with open('../preprocessed.json', 'w') as f:
+        f.write(json.dumps(preprocess_obj.documents))
+        f.close()

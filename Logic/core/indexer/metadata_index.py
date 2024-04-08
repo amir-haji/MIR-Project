@@ -3,7 +3,7 @@ from indexes_enum import Indexes, Index_types
 import json
 
 class Metadata_index:
-    def __init__(self, path='index2/'):
+    def __init__(self, path='index/'):
         """
         Initializes the Metadata_index.
 
@@ -25,7 +25,7 @@ class Metadata_index:
         """
 
         #TODO
-        with open('../preprocessed.json', 'r') as f:
+        with open('../preprocessed_duplicate_checked.json', 'r') as f:
             data = json.loads(f.read())
             f.close()
             

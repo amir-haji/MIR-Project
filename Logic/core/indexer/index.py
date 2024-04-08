@@ -451,11 +451,18 @@ if __name__ == "__main__":
 
     index_obj.check_if_indexing_is_good('stars', 'christian')
     index_obj.check_if_indexing_is_good('stars', 'tarantino')
+
+    path = 'index/'
+    index_obj.store_index(path, 'documents')
+    index_obj.store_index(path, 'genres')
+    index_obj.store_index(path, 'stars')
+    index_obj.store_index(path, 'summaries')
+    
     #######################
     index_obj.load_index('/Users/hajmohammadrezaee/Desktop/MIR-Project/index')
 
     for index_name in ['stars', 'genres', 'summaries', 'documents']:
-        with open(f'/Users/hajmohammadrezaee/Desktop/MIR-Project/index2/{index_name}_index.json', 'r') as f:
+        with open(f'/Users/hajmohammadrezaee/Desktop/MIR-Project/index/{index_name}_index.json', 'r') as f:
             index = json.loads(f.read())
             f.close()
 
@@ -464,9 +471,3 @@ if __name__ == "__main__":
             print(f'{index_name} loaded correctly')
         else:
             print(f'{index_name} loaded wrong')
-
-    path = 'index2/'
-    index_obj.store_index(path, 'documents')
-    index_obj.store_index(path, 'genres')
-    index_obj.store_index(path, 'stars')
-    index_obj.store_index(path, 'summaries')
