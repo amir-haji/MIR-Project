@@ -201,3 +201,27 @@ if __name__ == '__main__':
     result = search_engine.search(query, method, weights)
 
     print(result)
+
+    with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core/utility/validation.json', 'r') as f:
+        validation = json.loads(f.read())
+        f.close()
+
+    queries = list(validation.keys())
+    actual = list(validation.values())
+
+    predicted = {}
+    search_engine = SearchEngine()
+    method = "lnc.ltc"
+    weights = {
+        Indexes.STARS: 1,
+        Indexes.GENRES: 1,
+        Indexes.SUMMARIES: 1
+    }
+    max_results = 5
+    for query in queries:
+        res = search_engine.search(query, method, weights, max_results=5)
+        result = [x[0] for x in res]
+        predicted[query] = result
+
+    with open('prediction.json', 'w') as f:
+        f.write(json.dumps(predicted))

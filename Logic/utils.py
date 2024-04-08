@@ -3,6 +3,7 @@ from .core.search import SearchEngine
 from .core.spell_correction import SpellCorrection
 from .core.snippet import Snippet
 from .core.indexer.indexes_enum import Indexes, Index_types
+from .core.preprocess import Preprocessor
 import json
 
 with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/index/documents_index.json', 'r') as f:
@@ -30,6 +31,8 @@ def correct_text(text: str, all_documents: List[str]) -> str:
     # TODO: You can add any preprocessing steps here, if needed!
     spell_correction_obj = SpellCorrection(all_documents)
     text = spell_correction_obj.spell_check(text)
+    preprocess_obj = Preprocessor([])
+    text = preprocess_obj.normalize(text)
     return text
 
 

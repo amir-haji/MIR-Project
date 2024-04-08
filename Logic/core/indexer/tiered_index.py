@@ -4,7 +4,7 @@ import json
 
 
 class Tiered_index:
-    def __init__(self, path="index/"):
+    def __init__(self, path="index2/"):
         """
         Initializes the Tiered_index.
 
@@ -97,5 +97,5 @@ class Tiered_index:
 
 if __name__ == "__main__":
     tiered = Tiered_index(
-        path="index/"
+        path="index2/"
     )

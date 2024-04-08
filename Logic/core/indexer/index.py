@@ -436,7 +436,7 @@ class Index:
 # TODO: Run the class with needed parameters, then run check methods and finally report the results of check methods
 
 if __name__ == "__main__":
-    with open('/Users/hajmohammadrezaee/Desktop/preprocessed.json', 'r') as f:
+    with open('/Users/hajmohammadrezaee/Desktop/preprocessed_duplicate_checked.json', 'r') as f:
         preprocessed_data = json.loads(f.read())
         f.close()
 
@@ -444,15 +444,29 @@ if __name__ == "__main__":
 
     index_obj.check_add_remove_is_correct()
     index_obj.check_if_indexing_is_good('summaries')
-    index_obj.check_if_indexing_is_good('summaries', 'crime')
+    index_obj.check_if_indexing_is_good('summaries', 'dracula')
 
-    index_obj.check_if_indexing_is_good('genres', 'drama')
-    index_obj.check_if_indexing_is_good('genres', 'action')
+    index_obj.check_if_indexing_is_good('genres', 'tv')
+    index_obj.check_if_indexing_is_good('genres', 'show')
 
     index_obj.check_if_indexing_is_good('stars', 'christian')
     index_obj.check_if_indexing_is_good('stars', 'tarantino')
+    #######################
+    index_obj.load_index('/Users/hajmohammadrezaee/Desktop/MIR-Project/index')
 
-    index_obj.store_index('index/', 'documents')
-    index_obj.store_index('index/', 'genres')
-    index_obj.store_index('index/', 'stars')
-    index_obj.store_index('index/', 'summaries')
+    for index_name in ['stars', 'genres', 'summaries', 'documents']:
+        with open(f'/Users/hajmohammadrezaee/Desktop/MIR-Project/index2/{index_name}_index.json', 'r') as f:
+            index = json.loads(f.read())
+            f.close()
+
+        ans = index_obj.check_if_index_loaded_correctly(index_name, index)
+        if ans:
+            print(f'{index_name} loaded correctly')
+        else:
+            print(f'{index_name} loaded wrong')
+
+    path = 'index2/'
+    index_obj.store_index(path, 'documents')
+    index_obj.store_index(path, 'genres')
+    index_obj.store_index(path, 'stars')
+    index_obj.store_index(path, 'summaries')

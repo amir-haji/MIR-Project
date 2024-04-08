@@ -3,7 +3,7 @@ from indexes_enum import Indexes, Index_types
 import json
 
 class Metadata_index:
-    def __init__(self, path='index/'):
+    def __init__(self, path='index2/'):
         """
         Initializes the Metadata_index.
 

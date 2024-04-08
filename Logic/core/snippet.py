@@ -60,6 +60,7 @@ class Snippet:
 
         # TODO: Extract snippet and the tokens which are not present in the doc.
         
+        query = self.remove_stop_words_from_query(query)
         query_tokens = query.split(' ')
         doc_tokens = doc.split(' ')
         occurance_indexes = []
@@ -76,8 +77,8 @@ class Snippet:
 
         eliminated_indices = []
         for i in range(0, len(occurance_indexes) - 1):
-            if occurance_indexes[i+1] - occurance_indexes[i] <= 10:
-                eliminated_indices.append(occurance_indexes[i])
+            if occurance_indexes[i+1] - occurance_indexes[i] >= 10:
+                eliminated_indices.append(occurance_indexes[i+1])
                         
         for index in occurance_indexes:
             if index not in eliminated_indices:
