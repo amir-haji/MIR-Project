@@ -2,8 +2,8 @@ import time
 import os
 import json
 import copy
-from indexes_enum import Indexes
-from tiered_index import Tiered_index
+from .indexes_enum import Indexes
+
 
 class Index:
     def __init__(self, preprocessed_documents: list):
