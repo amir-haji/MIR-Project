@@ -1,4 +1,7 @@
+import sys
+sys.path.append('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core/utility')
 from preprocess import Preprocessor
+
 import numpy as np
 import itertools
 import random
@@ -214,7 +217,7 @@ if __name__ == "__main__":
         data1 = json.loads(f.read())
         f.close()
 
-    with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core/LSHFakeData.json', 'r') as f:
+    with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core/indexer/LSHFakeData.json', 'r') as f:
         data2 = json.loads(f.read())
         f.close()
 

@@ -18,7 +18,7 @@ class Preprocessor:
             The list of documents to be preprocessed, path to stop words, or other parameters.
         """
         # TODO
-        with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/UI/../Logic/core/stopwords.txt', 'r') as f:
+        with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/UI/../Logic/core/utility/stopwords.txt', 'r') as f:
             txt = f.read()
             f.close()
             
@@ -37,12 +37,18 @@ class Preprocessor:
             The preprocessed documents.
         """
          # TODO
+        list_attrs = ['stars', 'writers', 'directors', 'reviews', 'synopsis', 'summaries', 'languages', 'countries_of_origin']
         for doc in self.documents:
             if isinstance(doc, str):
                 self.documents = [self.normalize(doc)]
                 return self.documents.copy()
             else:
                 for k in doc:
+                    if doc[k] is None:
+                        if k in list_attrs:
+                            doc[k] = []
+                        else:
+                            doc[k] = ''
                     if isinstance(doc[k], list):
                         new_item = []
                         if len(doc[k]) != 0:
