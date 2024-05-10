@@ -1,11 +1,8 @@
 import json
 import numpy as np
-from .utility import Preprocessor, Scorer
-from .indexer import Indexes, Index_types, Index_reader
+from utility import Preprocessor, Scorer
+from indexer import Indexes, Index_types, Index_reader
 
-
-import json
-import numpy as np
 
 class SearchEngine:
     def __init__(self):
@@ -13,7 +10,7 @@ class SearchEngine:
         Initializes the search engine.
 
         """
-        path = "/index"
+        path = "/Users/hajmohammadrezaee/Desktop/MIR-Project/index/"
         self.document_indexes = {
             Indexes.STARS: Index_reader(path, Indexes.STARS),
             Indexes.GENRES: Index_reader(path, Indexes.GENRES),
@@ -82,7 +79,7 @@ class SearchEngine:
             A list of tuples containing the document IDs and their scores sorted by their scores.
         """
         preprocessor = Preprocessor([query])
-        query = preprocessor.preprocess()[0]
+        query = preprocessor.preprocess()[0].split(' ')
 
         scores = {}
         if method == "unigram":
@@ -148,10 +145,21 @@ class SearchEngine:
         scores : dict
             The scores of the documents.
         """
-        for field in weights:
-            for tier in ["first_tier", "second_tier", "third_tier"]:
-                # TODO
-                pass
+        for tier in ["first_tier", "second_tier", "third_tier"]:
+            for field in weights:
+                #TODO
+                tiered_field_index = self.tiered_index[field].index[tier]
+                scorer_obj = Scorer(tiered_field_index, self.metadata_index.index['document_count'])
+            
+                if method == 'OkapiBM25':
+                    results = scorer_obj.compute_socres_with_okapi_bm25(query, self.metadata_index.index['average_document_length'][field.value], self.document_lengths_index[field].index)
+                else:
+                    results = scorer_obj.compute_scores_with_vector_space_model(query, method)
+                    
+                self.merge_scores(scores, results, field)
+                
+            if len(list(scores.keys())) >= max_results:
+                break
 
     def find_scores_with_safe_ranking(self, query, method, weights, scores):
         """
@@ -170,8 +178,16 @@ class SearchEngine:
         """
 
         for field in weights:
-            # TODO
-            pass
+            #TODO
+            field_indexes = self.document_indexes[field].index
+            scorer_obj = Scorer(field_indexes, self.metadata_index.index['document_count'])
+            
+            if method == 'OkapiBM25':
+                results = scorer_obj.compute_socres_with_okapi_bm25(query, self.metadata_index.index['average_document_length'][field.value], self.document_lengths_index[field].index)
+            else:
+                results = scorer_obj.compute_scores_with_vector_space_model(query, method)
+                
+            self.merge_scores(scores, results, field)
 
     def find_scores_with_unigram_model(
         self, query, smoothing_method, weights, scores, alpha=0.5, lamda=0.5
@@ -196,9 +212,15 @@ class SearchEngine:
             probability and the collection probability. Defaults to 0.5.
         """
         # TODO
-        pass
+        for field in weights:
+            field_indexes = self.document_indexes[field].index
+            scorer_obj = Scorer(field_indexes, self.metadata_index.index['document_count'])
+            
+            results = scorer_obj.compute_scores_with_unigram_model(query, smoothing_method, self.document_lengths_index[field].index, alpha, lamda)
+            
+            self.merge_scores(scores, results, field)
 
-    def merge_scores(self, scores1, scores2):
+    def merge_scores(self, scores1, scores2, field):
         """
         Merges two dictionaries of scores.
 
@@ -215,18 +237,22 @@ class SearchEngine:
             The merged dictionary of scores.
         """
 
-        # TODO
-
+        #TODO
+        for doc_id, score in scores2.items():
+            if doc_id in scores1:
+                scores1[doc_id][field] = score
+            else:
+                scores1[doc_id] = {field: score}
 
 if __name__ == "__main__":
     search_engine = SearchEngine()
     query = "spider man in wonderland"
-    method = "lnc.ltc"
+    method = "unigram"
     weights = {Indexes.STARS: 1, Indexes.GENRES: 1, Indexes.SUMMARIES: 1}
     result = search_engine.search(query, method, weights)
 
     print(result)
-
+    """"
     with open('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core/utility/validation.json', 'r') as f:
         validation = json.loads(f.read())
         f.close()
@@ -241,3 +267,4 @@ if __name__ == "__main__":
     result = search_engine.search(query, method, weights)
 
     print(result)
+    """
