@@ -1,9 +1,9 @@
 import numpy as np
 from sklearn.metrics import classification_report
 from tqdm import tqdm
-
-from .basic_classifier import BasicClassifier
-from .data_loader import ReviewLoader
+from scipy.spatial import distance
+from basic_classifier import BasicClassifier
+from data_loader import ReviewLoader
 
 
 class KnnClassifier(BasicClassifier):
@@ -28,7 +28,8 @@ class KnnClassifier(BasicClassifier):
         self
             Returns self as a classifier
         """
-        pass
+        self.x_train = x
+        self.y_train = y
 
     def predict(self, x):
         """
@@ -42,8 +43,27 @@ class KnnClassifier(BasicClassifier):
             Return the predicted class for each doc
             with the highest probability (argmax)
         """
-        pass
+        
+        prediction = []
+        with tqdm(x) as t:
+            for z in t:
+                distances = []
+                for j in range(len(self.x_train)):
+                    distances.append((j, distance.euclidean(z, x_train[j])))
 
+                distances.sort(key = lambda x: x[1])
+                neighbours = distances[:self.k]
+                labels = [y_train[x[0]] for x in neighbours]
+
+                if sum(labels) > len(labels)/2:
+                    prediction.append(1)
+                else:
+                    prediction.append(0)
+                
+        return np.array(prediction)
+            
+            
+        
     def prediction_report(self, x, y):
         """
         Parameters
@@ -57,7 +77,9 @@ class KnnClassifier(BasicClassifier):
         str
             Return the classification report
         """
-        pass
+        y_pred = self.predict(x)
+        print(classification_report(y, y_pred))
+
 
 
 # F1 Accuracy : 70%
@@ -65,4 +87,12 @@ if __name__ == '__main__':
     """
     Fit the model with the training data and predict the test data, then print the classification report
     """
-    pass
+    rl = ReviewLoader('IMDB Dataset.csv')
+    rl.load_data()
+    rl.get_embeddings()
+
+    x_train, x_test, y_train, y_test = rl.split_data()
+
+    cls = KnnClassifier(5)
+    cls.fit(x_train, y_train)
+    cls.prediction_report(x_test, y_test)

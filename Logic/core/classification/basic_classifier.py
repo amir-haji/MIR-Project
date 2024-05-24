@@ -1,12 +1,13 @@
 import numpy as np
 from tqdm import tqdm
 
-from ..word_embedding.fasttext_model import FastText
-
+import sys
+sys.path.append('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core')
+from word_embedding.fasttext_model import FastText
 
 class BasicClassifier:
     def __init__(self):
-        raise NotImplementedError()
+        pass
 
     def fit(self, x, y):
         raise NotImplementedError()
@@ -29,5 +30,10 @@ class BasicClassifier:
         float
             The percentage of positive reviews
         """
-        pass
+        model = FastText()
+        model.prepare(None, 'load', 'FastText_model.bin')
+        embeddings = np.array([model.get_query_embedding(sent) for sent in sentences])
+        
+        pred = self.predict(sentences)
+        return sum(pred) / len(pred)
 
