@@ -2,28 +2,57 @@ import numpy as np
 import os
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-
-from ..word_embedding.fasttext_data_loader import FastTextDataLoader
-from ..word_embedding.fasttext_model import FastText
-from .dimension_reduction import DimensionReduction
-from .clustering_metrics import ClusteringMetrics
-from .clustering_utils import ClusteringUtils
+import sys
+sys.path.append('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core')
+from word_embedding.fasttext_data_loader import FastTextDataLoader
+from word_embedding.fasttext_model import FastText, preprocess_text
+from dimension_reduction import DimensionReduction
+from clustering_metrics import ClusteringMetrics
+from clustering_utils import ClusteringUtils
 
 # Main Function: Clustering Tasks
 
+project_name = 'clustering'
+run_name = 0
 # 0. Embedding Extraction
 # TODO: Using the previous preprocessor and fasttext model, collect all the embeddings of our data and store them.
 
+
+dataloader = FastTextDataLoader('../IMDB_crawled.json', preprocess_text)
+X, y = dataloader.create_train_data()
+document_labels = list(dataloader.le.inverse_transform(y))
+ft_model = FastText()
+ft_model.prepare(None, 'load')
+embed = []
+with tqdm(X) as pbar:
+    for x in pbar:
+        embed.append(ft_model.get_query_embedding(x))
+
+embed = np.array(embed)
+'''
+np.save('cluster_embeddings.npy', embed)
+np.save('cluster_labels.npy', y)
+'''
+# embed = np.load('cluster_embeddings.npy')
+# y = np.load('cluster_labels.npy')
 # 1. Dimension Reduction
 # TODO: Perform Principal Component Analysis (PCA):
 #     - Reduce the dimensionality of features using PCA. (you can use the reduced feature afterward or use to the whole embeddings)
 #     - Find the Singular Values and use the explained_variance_ratio_ attribute to determine the percentage of variance explained by each principal component.
 #     - Draw plots to visualize the results.
 
+'''
+dr = DimensionReduction()
+pca_embed = dr.pca_reduce_dimension(embed, 2)
+dr.wandb_plot_explained_variance_by_components(embed, project_name, run_name)
+
 # TODO: Implement t-SNE (t-Distributed Stochastic Neighbor Embedding):
 #     - Create the convert_to_2d_tsne function, which takes a list of embedding vectors as input and reduces the dimensionality to two dimensions using the t-SNE method.
 #     - Use the output vectors from this step to draw the diagram.
 
+tsne_embed = dr.convert_to_2d_tsne(embed)
+dr.wandb_plot_2d_tsne(embed, project_name, run_name)
+'''
 # 2. Clustering
 ## K-Means Clustering
 # TODO: Implement the K-means clustering algorithm from scratch.
@@ -35,7 +64,8 @@ from .clustering_utils import ClusteringUtils
 #     - Check the implementation and efficiency of the algorithm in clustering similar documents.
 # TODO: Draw the silhouette score graph for different values of k and perform silhouette analysis to choose the appropriate k.
 # TODO: Plot the purity value for k using the labeled data and report the purity value for the final k. (Use the provided functions in utilities)
-
+clustering = ClusteringUtils()
+clustering.visualize_kmeans_clustering_wandb(embed, 3, document_labels, project_name, run_name)
 ## Hierarchical Clustering
 # TODO: Perform hierarchical clustering with all different linkage methods.
 # TODO: Visualize the results.
