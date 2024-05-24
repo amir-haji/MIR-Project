@@ -1,4 +1,4 @@
-from graph import LinkGraph
+from .graph import LinkGraph
 import sys
 sys.path.append('/Users/hajmohammadrezaee/Desktop/MIR-Project/Logic/core')
 from indexer.indexes_enum import Indexes
@@ -34,12 +34,12 @@ class LinkAnalyzer:
         """
         for movie in self.root_set:
             id, title, stars = list(movie.values())
-            self.graph.add_node(title)
-            self.hubs.append(title)
+            self.graph.add_node(id)
+            self.hubs.append(id)
             for star in stars:
                 self.graph.add_node(star)
                 self.authorities.append(star)
-                self.graph.add_edge(title, star)
+                self.graph.add_edge(id, star)
             
 
     def expand_graph(self, corpus):
@@ -71,13 +71,13 @@ class LinkAnalyzer:
                     break
                     
             if add_movie:
-                self.graph.add_node(title)
-                self.hubs.append(title)
+                self.graph.add_node(id)
+                self.hubs.append(id)
                 for star in stars:
                     if star not in self.authorities:
                         self.graph.add_node(star)
                         self.authorities.append(star)
-                    self.graph.add_edge(title, star)
+                    self.graph.add_edge(id, star)
                     
             
 

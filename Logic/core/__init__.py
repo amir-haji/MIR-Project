@@ -1,7 +1,7 @@
 from .indexer import *
 from .utility import *
 from .search import *
-from .link_analysis import *
+# from .link_analysis import *
 from .classification import *
 from .clustering import *
 from .word_embedding import *

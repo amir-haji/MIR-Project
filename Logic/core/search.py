@@ -1,7 +1,8 @@
 import json
 import numpy as np
-from utility import Preprocessor, Scorer
-from indexer import Indexes, Index_types, Index_reader
+from .utility.preprocess import Preprocessor
+from .utility.scorer import Scorer
+from .indexer import Indexes, Index_types, Index_reader
 
 
 class SearchEngine:

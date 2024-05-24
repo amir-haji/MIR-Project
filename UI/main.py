@@ -24,7 +24,7 @@ class color(Enum):
 
 
 def get_top_x_movies_by_rank(x: int, results: list):
-    path = "../Logic/core/index/"  # Link to the index folder
+    path = "../index/"  # Link to the index folder
     document_index = Index_reader(path, Indexes.DOCUMENTS)
     corpus = []
     root_set = []
@@ -93,7 +93,8 @@ def search_handling(
         st.markdown(f"**Top {num_filter_results} Movies:**")
         for i in range(len(top_movies)):
             card = st.columns([3, 1])
-            info = utils.get_movie_by_id(top_movies[i], utils.movies_dataset)
+            info = utils.get_movie_by_id(top_movies[i], utils.all_documents)
+            print(info)
             with card[0].container():
                 st.title(info["title"])
                 st.markdown(f"[Link to movie]({info['URL']})")
@@ -144,9 +145,9 @@ def search_handling(
                 search_max_num,
                 search_method,
                 search_weights,
-                unigram_smoothing=unigram_smoothing,
-                alpha=alpha,
-                lamda=lamda,
+                unigram_smoothing = unigram_smoothing,
+                alpha = alpha,
+                lamda = lamda,
             )
             if "search_results" in st.session_state:
                 st.session_state["search_results"] = result
@@ -160,7 +161,8 @@ def search_handling(
 
         for i in range(len(result)):
             card = st.columns([3, 1])
-            info = utils.get_movie_by_id(result[i][0], utils.movies_dataset)
+            info = utils.get_movie_by_id(result[i][0], utils.all_documents)
+            print('**', info, '**')
             with card[0].container():
                 st.title(info["title"])
                 st.markdown(f"[Link to movie]({info['URL']})")
