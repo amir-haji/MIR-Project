@@ -39,7 +39,7 @@ class FastTextDataLoader:
         with open(self.file_path, 'r') as f:
             data = json.loads(f.read())
             f.close()
-        data = data[:100]
+        
         data_dict = {'synposis': [], 'summaries': [], 'reviews': [], 'title': [], 'genres': []}
         
         with tqdm(data) as t:
