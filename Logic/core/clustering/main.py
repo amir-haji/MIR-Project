@@ -19,7 +19,7 @@ k_values = list(range(2, 9))
 # 0. Embedding Extraction
 # TODO: Using the previous preprocessor and fasttext model, collect all the embeddings of our data and store them.
 
-'''
+
 dataloader = FastTextDataLoader('../IMDB_crawled.json', preprocess_text)
 X, y = dataloader.create_train_data()
 document_labels = list(dataloader.le.inverse_transform(y))
@@ -38,7 +38,7 @@ with open('document_labels.json', 'w') as f:
     f.write(json.dumps(document_labels))
     f.close()
 
-'''
+
 embed = np.load('cluster_embeddings.npy')
 y = np.load('cluster_labels.npy')
 
