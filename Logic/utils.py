@@ -51,6 +51,9 @@ def search(
     lamda = 0.5, 
     should_print=False,
     preferred_genre: str = None,
+    smoothing_method = None, 
+    alpha=0.5, 
+    lamda=0.5, 
 ):
     """
     Finds relevant documents to query
