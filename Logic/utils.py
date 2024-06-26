@@ -47,13 +47,11 @@ def search(
     method: str = "ltn-lnn",
     weights: list = [0.3, 0.3, 0.4],
     unigram_smoothing = None,
-    alpha = 0.5, 
-    lamda = 0.5, 
     should_print=False,
     preferred_genre: str = None,
     smoothing_method = None, 
     alpha=0.5, 
-    lamda=0.5, 
+    lamda=0.5
 ):
     """
     Finds relevant documents to query
