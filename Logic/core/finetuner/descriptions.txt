@@ -1,0 +1,7 @@
+For this part, I've executed the code in the Jupiter notebook on colab. I appendixed the notebook link here:
+
+https://colab.research.google.com/drive/1ztVDLP8hM0NFWK_JI-QBzwj9wQ3Z3tpm?usp=sharing
+
+I also appendexied the link to hugging face model in hugging hub here: 
+https://huggingface.co/hajimr80/Movie_Genre_Classifier
+https://huggingface.co/hajimr80/Movie_Genre_Classifier_v2
